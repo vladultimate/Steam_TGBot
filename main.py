@@ -112,7 +112,6 @@ def handle_action(message):
         )
 
     if message.text == '🛒 Додати скін':
-        
         cursor.execute("SELECT id, max_lots FROM users WHERE username = ?", (message.from_user.username,))
         user_data = cursor.fetchone()
         if user_data is None:
@@ -133,6 +132,7 @@ def handle_action(message):
             bot.send_message(message.chat.id, '🔗 Будь ласка, скиньте посилання на ваш товар.')
             bot.register_next_step_handler(message, process_skin_url, user_id)
 
+
     if message.text == '🗑 Очистити свої данні':
         cursor.execute("SELECT id FROM users WHERE username = ?", (message.from_user.username,))
         user_data = cursor.fetchone()
@@ -141,6 +141,7 @@ def handle_action(message):
         conn.commit()
         bot.send_message(message.chat.id, '🗑️ Ваші лоти очищено!', reply_markup=update_keyboard(message))
 
+
     if message.text == '🆘 Допомога':
         markup = types.InlineKeyboardMarkup()
         item1 = types.InlineKeyboardButton("Що робить цей бот? Для чого його використовують?", callback_data='whats_doing_this_bot')
@@ -148,6 +149,7 @@ def handle_action(message):
         markup.row(item1)
         markup.row(item2)
         bot.send_message(message.chat.id, 'Виберіть питання зі списку: ', reply_markup=markup)
+
 
     if message.text == '⚠️ Надіслати проблему': 
         cursor.execute("SELECT id FROM users WHERE username = ?", (message.from_user.username,))
@@ -158,6 +160,7 @@ def handle_action(message):
         bot.send_message(message.chat.id, '🔑 Будь ласка, введіть ваш E-mail для зв’язку з вами по поводу вашої проблеми:')
         bot.register_next_step_handler(message, process_email_input)
 
+
     if message.text == '⏸️ Призупинити моніторинг':
         cursor.execute("SELECT id FROM users WHERE username = ?", (message.from_user.username,))
         user_data = cursor.fetchone()
@@ -165,6 +168,7 @@ def handle_action(message):
         cursor.execute("UPDATE skins SET is_active = 0 WHERE user_id = ?", (user_id,))
         conn.commit()
         bot.send_message(message.chat.id, "⏸️ Моніторинг призупинено для всіх ваших товарів.", reply_markup=update_keyboard(message))
+
 
     if message.text == '▶️ Відновити моніторинг':
         cursor.execute("SELECT id FROM users WHERE username = ?", (message.from_user.username,))
@@ -240,6 +244,7 @@ def update_keyboard(message):
                 markup.add(item_resume)
     except:
         pass
+
     item1 = types.KeyboardButton("🛒 Додати скін")
     item2 = types.KeyboardButton("🆘 Допомога")
     item3 = types.KeyboardButton("🔗 Реферальне посилання")
@@ -247,6 +252,7 @@ def update_keyboard(message):
     markup.add(item1, item2)
     markup.add(item3)
     markup.add(item4)
+
     try:
         if user_skins[0][0]:
             markup.add(types.KeyboardButton("🗑 Очистити свої данні"))
@@ -286,6 +292,7 @@ def process_email_input(message):
     bot.send_message(message.chat.id, 'Опишіть вашу проблему:')
     bot.register_next_step_handler(message, process_help_request, user_email)
 
+
 def process_help_request(message, user_email):
     problem = message.text 
 
@@ -300,6 +307,7 @@ def process_help_request(message, user_email):
 
     bot.send_message(message.chat.id, '📧Ваше повідомлення надіслано! Ми зв’яжемося з вами найближчим часом.', parse_mode='html', reply_markup=update_keyboard(message))
 
+
 @bot.callback_query_handler(func=lambda call: True)
 def questions_answers(call):
     if call.data == 'Return_to_default':
@@ -310,6 +318,7 @@ def questions_answers(call):
         )  
         bot.send_message(call.message.chat.id, welcome_message, reply_markup=update_keyboard(call), parse_mode='html')
         
+
     if call.data == 'FAQ':
         markup = types.InlineKeyboardMarkup()
         item1 = types.InlineKeyboardButton("Що робить цей бот? Для чого його використовують?", callback_data='whats_doing_this_bot')
@@ -317,6 +326,7 @@ def questions_answers(call):
         markup.row(item1)
         markup.row(item2)
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Виберіть питання зі списку: ", parse_mode='html', reply_markup=markup)
+
 
     if call.data == 'whats_doing_this_bot':
         markup = types.InlineKeyboardMarkup()
@@ -342,6 +352,7 @@ async def custom_checks():
         """)
         skins = cursor.fetchall()
         
+
         for skin in skins:
             chat_id, skin_url, price, action, last_price_message_id = skin
             if skin_url is None:
@@ -367,8 +378,10 @@ async def custom_checks():
                 print(e)
         await asyncio.sleep(20)
 
+
 def bot_polling():
     bot.polling(none_stop=True)
+
 
 def main():
     bot_thread = threading.Thread(target=bot_polling)
@@ -376,6 +389,7 @@ def main():
     bot_thread.start()
 
     asyncio.run(custom_checks())
+
 
 if __name__ == '__main__':
     main()
