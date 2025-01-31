@@ -9,16 +9,6 @@ from fake_useragent import UserAgent
 from send_gmails import send_email, process_email_input
 
 
-TOKEN_INFO = "#############"
-bot = telebot.TeleBot(TOKEN_INFO)
-
-
-conn = sqlite3.connect('users.db', check_same_thread=False)
-cursor = conn.cursor()
-
-user_agent = UserAgent()
-
-
 async def get_currency_rate(currency_code='USD'):
     url = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
     async with aiohttp.ClientSession() as session:
@@ -43,6 +33,13 @@ async def get_skinprice(link):
                     price = float(price.replace("$", ''))
                     exchange_rate = await get_currency_rate('USD')  
                     return round(price * exchange_rate)
+TOKEN_INFO = ''
+bot = telebot.TeleBot(f"{TOKEN_INFO}")
+
+conn = sqlite3.connect('users.db', check_same_thread=False)
+cursor = conn.cursor()
+
+user_agent = UserAgent()
 
 
 @bot.message_handler(commands=['start'])
