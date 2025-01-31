@@ -4,8 +4,8 @@ from email.mime.multipart import MIMEMultipart
 import re
 
 def send_email(subject, body, to_email):
-    from_email = "vladultimate2010@gmail.com"
-    password = "inrq gtbs mxll xpre"
+    from_email = "######"
+    password = "######"
 
     msg = MIMEMultipart()
     msg['From'] = from_email
